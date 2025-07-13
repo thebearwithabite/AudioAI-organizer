@@ -1,0 +1,27 @@
+# AudioAI Organizer Dependencies
+# Core AI and Audio Processing
+openai>=1.0.0
+librosa>=0.10.0
+mutagen>=1.47.0
+
+# Data Management
+pandas>=1.5.0
+openpyxl>=3.1.0
+numpy>=1.24.0
+
+# Audio Analysis
+scipy>=1.10.0
+soundfile>=0.12.0
+
+# Development and Jupyter Support (optional)
+jupyter>=1.0.0
+ipython>=8.0.0
+tqdm>=4.64.0
+
+# Utilities
+pathlib2>=2.3.7; python_version < "3.4"
+pickle5>=0.0.11; python_version < "3.8"
+
+# Optional: Advanced audio processing
+# essentia>=2.1b6.dev1085  # For advanced music analysis
+# aubio>=0.4.9  # Alternative tempo detection
