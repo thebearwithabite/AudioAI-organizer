@@ -47,6 +47,10 @@ downloads/
 
 **Plus:** Confidence scores, AI reasoning, cross-references, and learning statistics!
 
+## 📺 Demo Video
+
+[![Watch the AudioAI Organizer Demo](https://img.youtube.com/vi/DKdwy9dbJ3g/0.jpg)](https://www.youtube.com/watch?v=DKdwy9dbJ3g)
+
 ## ️ Installation
 
 ### Prerequisites
