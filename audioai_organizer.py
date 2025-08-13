@@ -1,60 +1,4 @@
-# Cell: Initialize the adaptive organizer
-import os
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-if not OPENAI_API_KEY:
-    print("❌ Please set OPENAI_API_KEY environment variable")
-    print("   export OPENAI_API_KEY='your-api-key-here'")
-    exit(1)
-BASE_DIRECTORY = os.getenv('AUDIOAI_BASE_DIRECTORY')
-if not BASE_DIRECTORY:
-    print("❌ Please set AUDIOAI_BASE_DIRECTORY environment variable")
-    print("   export AUDIOAI_BASE_DIRECTORY='/path/to/your/audio/library'")
-    exit(1)
-
-# Initialize adaptive organizer
-organizer = AdaptiveAudioOrganizer(OPENAI_API_KEY, BASE_DIRECTORY)
-
-# See what it knows so far (will be empty first time)
-organizer.show_learning_stats()
-
-print("🚀 Adaptive Audio Organizer initialized!")
-print("This system will learn and expand as you process more files.")
-
-# Cell: Test the improved organizer
-organizer = AudioOrganizer(OPENAI_API_KEY, BASE_DIRECTORY)
-result = organizer.process_file(Path(test_file), dry_run=True)
-
-if result:
-    print(f"\n🎉 SUCCESS!")
-else:
-    print("❌ Still failing - but now we can see why")
-# Cell: Process multiple files
-from pathlib import Path
-
-to_sort_path = Path("/Users/ryanthomson/CONTENT_LIBRARY_MASTER/TO_SORT")
-audio_files = []
-
-# Find all audio files in TO_SORT
-for file_path in to_sort_path.rglob('*'):
-    if file_path.is_file() and file_path.suffix.lower() in {'.mp3', '.wav', '.aiff', '.m4a', '.flac', '.ogg', '.wma'}:
-        audio_files.append(file_path)
-
-print(f"Found {len(audio_files)} audio files in TO_SORT:")
-for i, file_path in enumerate(audio_files[:10]):  # Show first 10
-    print(f"  {i+1}. {file_path.name}")
-
-if len(audio_files) > 10:
-    print(f"  ... and {len(audio_files) - 10} more")
-
-# Process first few files
-print(f"\nProcessing first 3 files...")
-for file_path in audio_files[:3]:
-    try:
-        result = organizer.process_file(file_path, dry_run=True)
-        time.sleep(1)  # Don't hammer the API
-        print("-" * 50)
-    except Exception as e:
-        print(f"Error processing {file_path.name}: {e}")
+# Cell: Import required libraries
 import os
 import shutil
 import json
@@ -478,17 +422,15 @@ Return response as JSON:
 
 # Usage example
 if __name__ == "__main__":
-    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-        print("❌ Please set OPENAI_API_KEY environment variable")
-        print("   export OPENAI_API_KEY='your-api-key-here'")
+    try:
+        from config import OPENAI_API_KEY, BASE_DIRECTORY, ensure_base_structure
+        ensure_base_structure()
+        
+        # Initialize adaptive organizer
+        organizer = AdaptiveAudioOrganizer(OPENAI_API_KEY, str(BASE_DIRECTORY))
+    except RuntimeError as e:
+        print(f"❌ Configuration error: {e}")
         exit(1)
-    BASE_DIRECTORY = os.getenv('AUDIOAI_BASE_DIRECTORY')
-    if not BASE_DIRECTORY:
-        print("❌ Please set AUDIOAI_BASE_DIRECTORY environment variable")
-        print("   export AUDIOAI_BASE_DIRECTORY='/path/to/your/audio/library'")
-        exit(1)    
-    # Initialize adaptive organizer
-    organizer = AdaptiveAudioOrganizer(OPENAI_API_KEY, BASE_DIRECTORY)
     
     # Show current learning stats
     organizer.show_learning_stats()
@@ -506,27 +448,18 @@ from openai import OpenAI
 import mutagen
 from mutagen.id3 import ID3NoHeaderError
 
-# Cell 3: Configuration (EDIT THESE!)
-OPENAI_API_KEY = "sk-..."
-if not OPENAI_API_KEY:
-    print("❌ Please set OPENAI_API_KEY environment variable")
-    print("   export OPENAI_API_KEY='your-api-key-here'")
+# Cell 3: Configuration 
+try:
+    from config import OPENAI_API_KEY, BASE_DIRECTORY, ensure_base_structure
+    ensure_base_structure()
+except RuntimeError as e:
+    print(f"❌ Configuration error: {e}")
     exit(1)
-BASE_DIRECTORY = os.getenv('AUDIOAI_BASE_DIRECTORY')
-if not BASE_DIRECTORY:
-    print("❌ Please set AUDIOAI_BASE_DIRECTORY environment variable")
-    print("   export AUDIOAI_BASE_DIRECTORY='/path/to/your/audio/library'")
-    exit(1)  # Your main audio library folder
-DIRECTORIES_TO_SCAN = [
-    "/Users/ryanthomson/Downloads",
-    "/Users/ryanthomson/Desktop", 
-    "/Users/ryanthomson/Documents",
-    "/Users/ryanthomson/CONTENT_LIBRARY_MASTER/TO_SORT",  # That blue folder I see
-    "/Users/ryanthomson/CONTENT_LIBRARY_MASTER/99_Accepted",  # Another folder I see
-    "/Users/ryanthomson/Documents/Projects/Sound Library",
-    "/Users/ryanthomson/Documents/Projects/Voice Folder",
-    "/Users/ryanthomson/Documents/Projects/Voice Folder"
-]
+
+# Import directories to scan from config, with fallback to base directory
+from config import DIRECTORIES_TO_SCAN
+if not DIRECTORIES_TO_SCAN:
+    DIRECTORIES_TO_SCAN = [BASE_DIRECTORY]
 # Cell 4: The AudioOrganizer class
 class AudioOrganizer:
     def __init__(self, openai_api_key, base_directory):
@@ -833,7 +766,7 @@ print("=" * 70)
 
 # Configure for full sweep
 DIRECTORIES_TO_SCAN = [
-    "/Users/ryanthomson/CONTENT_LIBRARY_MASTER",  # Everything!
+    str(BASE_DIRECTORY),  # Everything!
 ]
 
 # Find ALL audio files recursively
@@ -854,7 +787,7 @@ print(f"📊 Found {len(all_audio_files)} audio files to process")
 # Show what we found
 folders_found = {}
 for file_path in all_audio_files:
-    folder = str(file_path.parent.relative_to(Path("/Users/ryanthomson/CONTENT_LIBRARY_MASTER")))
+    folder = str(file_path.parent.relative_to(BASE_DIRECTORY))
     folders_found[folder] = folders_found.get(folder, 0) + 1
 
 print(f"\n📂 Files by folder:")
@@ -1484,9 +1417,10 @@ Return JSON:
 print("🎵 Complete Enhanced AdaptiveAudioOrganizer created!")
 print("✅ Includes: Audio analysis, BPM detection, adaptive learning, enhanced filenames")
 # Cell: Test with your file
-test_file = "/Users/ryanthomson/CONTENT_LIBRARY_MASTER/TO_SORT/Jul_04__0231_14s_202507040259_bqqop.mp3"
+from config import resolve_test_file
+test_file = resolve_test_file()
 
-if Path(test_file).exists():
+if test_file and test_file.exists():
     result = organizer.process_file(Path(test_file), dry_run=True)
     print("🎉 Test successful!")
 else:
@@ -1563,10 +1497,10 @@ def fixed_find_similar_files(self, filename):
 # Replace the method
 AdaptiveAudioOrganizer.find_similar_files = fixed_find_similar_files
 # Cell: Test with fixes
-test_file = "/Users/ryanthomson/CONTENT_LIBRARY_MASTER/TO_SORT/Jul_04__0231_14s_202507040259_bqqop.mp3"
+test_file = resolve_test_file()
 
 print(f"Testing with fixes...")
-if Path(test_file).exists():
+if test_file and test_file.exists():
     result = organizer.process_file(Path(test_file), dry_run=True)
     if result:
         print("🎉 Test successful!")
@@ -2748,7 +2682,7 @@ organizer = FixedAdaptiveAudioOrganizer(OPENAI_API_KEY, BASE_DIRECTORY)
 
 print("✅ Fixed organizer created!")
 # Cell: Test fixed organizer
-test_file = "/Users/ryanthomson/CONTENT_LIBRARY_MASTER/TO_SORT/Jul_04__0231_14s_202507040259_bqqop.mp3"
+test_file = resolve_test_file()
 
 if Path(test_file).exists():
     result = organizer.process_file(Path(test_file), dry_run=True)
@@ -2773,8 +2707,8 @@ print("=" * 70)
 print("🔍 Scanning your entire audio library...")
 all_audio_files = []
 
-#scan_path = Path("/Users/ryanthomson/CONTENT_LIBRARY_MASTER")
-scan_path = Path("/Users/ryanthomson/Documents/Projects")
+#scan_path = BASE_DIRECTORY
+scan_path = BASE_DIRECTORY
 
 for file_path in scan_path.rglob('*'):
     if file_path.is_file() and file_path.suffix.lower() in {'.mp3', '.wav', '.aiff', '.m4a', '.flac', '.ogg', '.wma'}:
@@ -3217,7 +3151,7 @@ def debug_classify_audio_file(self, file_path, user_description=""):
 
 # Test the debug version
 print("🔍 Testing OpenAI classification...")
-test_file = Path("/Users/ryanthomson/CONTENT_LIBRARY_MASTER/TO_SORT/Jul_04__0231_14s_202507040259_bqqop.mp3")
+test_file = resolve_test_file()
 debug_result = debug_classify_audio_file(organizer, test_file)
 # Cell: Create comprehensive metadata spreadsheet
 import pandas as pd
@@ -3313,7 +3247,7 @@ print(f"Columns: {list(df.columns)}")
 print(f"\nFirst few rows:")
 print(df[['original_filename', 'suggested_filename', 'bpm', 'category', 'mood', 'energy_level']].head())
 
-pip install openpyxl
+# pip install openpyxl
 
 # Cell: Test semantic word extraction
 print("\n🔍 Testing semantic word extraction...")
@@ -3804,7 +3738,7 @@ print("🤔 Interactive classification system added!")
 print("🤔 Setting up interactive classification mode...")
 
 # First, let's test with a file that might be uncertain
-test_file = Path("/Users/ryanthomson/CONTENT_LIBRARY_MASTER/TO_SORT/Jul_04__0231_14s_202507040259_bqqop.mp3")
+test_file = resolve_test_file()
 
 if test_file.exists():
     print(f"🎯 Testing interactive mode with: {test_file.name}")
@@ -3826,7 +3760,7 @@ else:
     print("🔍 Looking for any audio file to test with...")
     
     # Check TO_SORT folder
-    to_sort = Path("/Users/ryanthomson/CONTENT_LIBRARY_MASTER/TO_SORT")
+    to_sort = BASE_DIRECTORY / "TO_SORT"
     if to_sort.exists():
         audio_files = [f for f in to_sort.iterdir() 
                       if f.is_file() and f.suffix.lower() in {'.mp3', '.wav', '.m4a', '.aiff'}]
@@ -3890,7 +3824,7 @@ FixedAdaptiveAudioOrganizer.interactive_batch_process = interactive_batch_proces
 print("\n🚀 Testing interactive batch processing...")
 
 # Get some files to test with
-to_sort_path = Path("/Users/ryanthomson/CONTENT_LIBRARY_MASTER/TO_SORT")
+to_sort_path = BASE_DIRECTORY / "TO_SORT"
 if to_sort_path.exists():
     audio_files = [f for f in to_sort_path.iterdir() 
                    if f.is_file() and f.suffix.lower() in {'.mp3', '.wav', '.m4a', '.aiff'}]
@@ -3955,7 +3889,7 @@ organizer.interactive_batch_process = interactive_batch_process.__get__(organize
 
 print("🔧 Fixed batch processing method!")
 # Cell: Test the fixed batch processing
-to_sort_path = Path("/Users/ryanthomson/CONTENT_LIBRARY_MASTER/TO_SORT")
+to_sort_path = BASE_DIRECTORY / "TO_SORT"
 
 if to_sort_path.exists():
     audio_files = [f for f in to_sort_path.iterdir() 
@@ -3990,7 +3924,7 @@ print("🤔 Setting to 'always ask' mode to demonstrate the interactive question
 organizer.set_interaction_mode('always')
 
 # Test with the same file - now it will definitely ask questions
-test_file = Path("/Users/ryanthomson/CONTENT_LIBRARY_MASTER/TO_SORT/Jul_04__0231_14s_202507040259_bqqop.mp3")
+test_file = resolve_test_file()
 
 if test_file.exists():
     print(f"📁 Testing interactive mode with: {test_file.name}")
@@ -4097,7 +4031,7 @@ organizer._ask_classification_questions = enhanced_ask_classification_questions.
 
 print("🎵 Audio playback added to interactive classification!")
 # Cell: Test interactive classification with audio playback
-test_file = Path("/Users/ryanthomson/CONTENT_LIBRARY_MASTER/TO_SORT/Jul_04__0231_14s_202507040259_bqqop.mp3")
+test_file = resolve_test_file()
 
 print("🎵 Testing interactive classification WITH audio playback!")
 print("You'll be able to listen while answering questions!")
@@ -4124,31 +4058,20 @@ else:
 # Ryan's Audio Organization Notebook
 # ADHD-Friendly Setup for "The Papers That Dream"
 
-import os
-from pathlib import Path
+# Example: Setting up AudioAI Organization System
+# This section demonstrates how to use the system with environment variables
 
-# Your actual paths
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-if not OPENAI_API_KEY:
-    print("❌ Please set OPENAI_API_KEY environment variable")
-    print("   export OPENAI_API_KEY='your-api-key-here'")
+try:
+    from config import OPENAI_API_KEY, BASE_DIRECTORY, DIRECTORIES_TO_SCAN, ensure_base_structure
+    ensure_base_structure()
+except RuntimeError as e:
+    print(f"❌ Configuration error: {e}")
     exit(1)
-CONTENT_LIBRARY = "/Users/ryanthomson/CONTENT_LIBRARY_MASTER"
-PAPERS_PROJECT = "/Users/ryanthomson/Github/The_Papers_That_Dream"
 
-# Areas to scan for audio stragglers
-STRAGGLER_LOCATIONS = [
-    "/Users/ryanthomson/Desktop",
-    "/Users/ryanthomson/Documents", 
-    "/Users/ryanthomson/Downloads",
-    CONTENT_LIBRARY  # Also check for loose files in main library
-]
-
-print("🎵 Setting up Ryan's Audio Organization System")
+print("🎵 Setting up AudioAI Organization System")
 print("=" * 50)
-print(f"📁 Content Library: {CONTENT_LIBRARY}")
-print(f"📺 Papers Project: {PAPERS_PROJECT}")
-print(f"🎯 Current Episode: Attention Is All You Need")
+print(f"📁 Base Directory: {BASE_DIRECTORY}")
+print(f"🔍 Scan Directories: {DIRECTORIES_TO_SCAN or [BASE_DIRECTORY]}")
 print()
 
 # ================================================================
@@ -4157,33 +4080,29 @@ print()
 
 from audioai_organizer import AdaptiveAudioOrganizer
 
-# Initialize with consciousness-themed categories for your podcast
-organizer = AdaptiveAudioOrganizer(OPENAI_API_KEY, CONTENT_LIBRARY)
+# Initialize with base directory
+organizer = AdaptiveAudioOrganizer(OPENAI_API_KEY, str(BASE_DIRECTORY))
 
-# Add your consciousness podcast categories
-consciousness_categories = {
-    "music_consciousness": ["contemplative", "awakening", "digital_emergence", "memory_formation", "wonder_discovery"],
-    "sfx_consciousness": ["data_processing", "thought_formation", "digital_heartbeat", "memory_access", "attention_mechanism"],
-    "sfx_human_ai": ["dialogue_bridge", "connection_moment", "understanding_dawn", "barrier_dissolve"],
-    "voice_ai": ["synthetic_warmth", "digital_personality", "consciousness_voice", "memory_echo"],
-    "voice_human": ["wonder", "fear", "acceptance", "connection", "discovery"],
-    "ambient_liminal": ["threshold_space", "between_worlds", "transformation", "emergence"],
-    "attention_themed": ["focus_shift", "pattern_recognition", "information_flow", "neural_attention"]
+# Add custom categories if needed
+custom_categories = {
+    "music_custom": ["contemplative", "energetic", "mysterious", "uplifting"],
+    "sfx_custom": ["ambient", "mechanical", "digital", "organic"],
+    "voice_custom": ["narrative", "dialogue", "monologue", "announcement"]
 }
 
-organizer.add_custom_categories(consciousness_categories)
-organizer.set_interaction_mode('minimal')  # Less interruption for ADHD workflow
+organizer.add_custom_categories(custom_categories)
+organizer.set_interaction_mode('minimal')  # Less interruption for workflow
 
-print("✅ AudioAI Organizer initialized with consciousness themes!")
+print("✅ AudioAI Organizer initialized!")
 print()
 
 # ================================================================
-# STEP 2: Find Audio Stragglers
+# STEP 2: Find Audio Files
 # ================================================================
 
-def find_audio_stragglers(locations):
-    """Find all audio files in the straggler locations"""
-    all_stragglers = []
+def find_audio_files(locations):
+    """Find all audio files in the specified locations"""
+    all_files = []
     
     for location in locations:
         location_path = Path(location)
@@ -4193,26 +4112,13 @@ def find_audio_stragglers(locations):
             
         print(f"🔍 Scanning: {location}")
         
-        stragglers = organizer.find_audio_files_recursive(location)
+        files = organizer.find_audio_files_recursive(str(location))
         
-        # For Desktop/Documents, only scan top level + obvious audio folders
-        if any(folder in location for folder in ['Desktop', 'Documents']):
-            # Filter to avoid going too deep into random folders
-            filtered_stragglers = []
-            for file_path in stragglers:
-                path_parts = Path(file_path).parts
-                # Only include if file is in root or in obviously audio-related folders
-                if (len(path_parts) <= 4 or  # Not too deep
-                    any(audio_word in str(file_path).lower() for audio_word in 
-                        ['audio', 'music', 'sound', 'voice', 'podcast', 'episode'])):
-                    filtered_stragglers.append(file_path)
-            stragglers = filtered_stragglers
-        
-        print(f"  📄 Found {len(stragglers)} audio files")
-        all_stragglers.extend(stragglers)
+        print(f"  📄 Found {len(files)} audio files")
+        all_files.extend(files)
         
         # Show first few examples
-        for example in stragglers[:3]:
+        for example in files[:3]:
             print(f"    - {Path(example).name}")
         if len(stragglers) > 3:
             print(f"    ... and {len(stragglers) - 3} more")
@@ -4388,51 +4294,45 @@ import os
 from pathlib import Path
 from audioai_organizer import AdaptiveAudioOrganizer
 
-# Your setup (already working!)
-OPENAI_API_KEY = "your-actual-key-here"  # You've got this working
-CONTENT_LIBRARY = "/Users/ryanthomson/CONTENT_LIBRARY_MASTER"
-PAPERS_PROJECT = "/Users/ryanthomson/Github/The_Papers_That_Dream"
+# Example setup using config-driven approach
+try:
+    from config import OPENAI_API_KEY, BASE_DIRECTORY, DIRECTORIES_TO_SCAN, ensure_base_structure
+    ensure_base_structure()
+except RuntimeError as e:
+    print(f"❌ Configuration error: {e}")
+    exit(1)
 
-# Initialize (already done, but for reference)
-organizer = AdaptiveAudioOrganizer(OPENAI_API_KEY, CONTENT_LIBRARY)
+# Initialize with base directory  
+organizer = AdaptiveAudioOrganizer(OPENAI_API_KEY, str(BASE_DIRECTORY))
 
-# Add consciousness-themed categories for your podcast
-consciousness_categories = {
-    "music_consciousness": ["contemplative", "awakening", "digital_emergence", "memory_formation", "wonder_discovery"],
-    "sfx_consciousness": ["data_processing", "thought_formation", "digital_heartbeat", "memory_access", "attention_mechanism"],
-    "sfx_human_ai": ["dialogue_bridge", "connection_moment", "understanding_dawn", "barrier_dissolve"],
-    "voice_ai": ["synthetic_warmth", "digital_personality", "consciousness_voice", "memory_echo"],
-    "voice_human": ["wonder", "fear", "acceptance", "connection", "discovery"],
-    "ambient_liminal": ["threshold_space", "between_worlds", "transformation", "emergence"],
-    "attention_themed": ["focus_shift", "pattern_recognition", "information_flow", "neural_attention", "transformer_process"]
+# Add custom categories for your project
+custom_categories = {
+    "music_custom": ["contemplative", "energetic", "mysterious", "uplifting"],
+    "sfx_custom": ["ambient", "mechanical", "digital", "organic"],
+    "voice_custom": ["narrative", "dialogue", "monologue", "announcement"]
 }
 
-organizer.add_custom_categories(consciousness_categories)
-organizer.set_interaction_mode('minimal')  # ADHD-friendly
+organizer.add_custom_categories(custom_categories)
+organizer.set_interaction_mode('minimal')  # Less interruption
 
-print("🧠 Enhanced with consciousness themes for your podcast!")
+print("🧠 Enhanced with custom themes!")
 print("📊 Current learning state:")
 organizer.show_learning_stats()
 
 # ================================================================
-# STEP 1: Find Audio Stragglers
+# STEP 1: Find Audio Files
 # ================================================================
 
 print("\n" + "="*60)
-print("🧹 FINDING AUDIO STRAGGLERS")
+print("🧹 FINDING AUDIO FILES")
 print("="*60)
 
-# Areas to scan for audio stragglers
-STRAGGLER_LOCATIONS = [
-    "/Users/ryanthomson/Desktop",
-    "/Users/ryanthomson/Documents", 
-    "/Users/ryanthomson/Downloads",
-    CONTENT_LIBRARY  # Also loose files in main library
-]
+# Use directories from environment or fallback to base
+scan_locations = DIRECTORIES_TO_SCAN if DIRECTORIES_TO_SCAN else [BASE_DIRECTORY]
 
-def find_audio_stragglers_smart(locations):
-    """Find audio stragglers with ADHD-friendly filtering"""
-    all_stragglers = []
+def find_audio_files_smart(locations):
+    """Find audio files with smart filtering"""
+    all_files = []
     
     for location in locations:
         location_path = Path(location)
@@ -4753,13 +4653,10 @@ if __name__ == "__main__":
         print("❌ Please set AUDIOAI_BASE_DIRECTORY environment variable")
         print("   export AUDIOAI_BASE_DIRECTORY='/path/to/your/audio/library'")
         exit(1)    
-    # Directories to scan (customize these paths)
-    DIRECTORIES_TO_SCAN = [
-        "/Users/ryanthomson/Downloads",
-        "/Users/ryanthomson/Desktop",
-        "/Users/ryanthomson/Documents/Audio",
-        # Add your actual directories here
-    ]
+    # Directories to scan from environment
+    from config import DIRECTORIES_TO_SCAN
+    if not DIRECTORIES_TO_SCAN:
+        DIRECTORIES_TO_SCAN = [BASE_DIRECTORY]
     
     # Initialize organizer
     organizer = AdaptiveAudioOrganizer(OPENAI_API_KEY, BASE_DIRECTORY)
