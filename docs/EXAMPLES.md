@@ -56,7 +56,7 @@ def organize_sample_library():
     # Initialize for music production
     organizer = AdaptiveAudioOrganizer(
         openai_api_key=os.getenv('OPENAI_API_KEY'),
-        base_directory="/Users/producer/SampleLibrary"
+        base_directory="/path/to/your/SampleLibrary"
     )
     
     # Define music-specific categories
@@ -78,8 +78,8 @@ def organize_sample_library():
     
     # Scan common sample directories
     sample_dirs = [
-        "/Users/producer/Downloads/Samples",
-        "/Users/producer/Desktop/NewSamples",
+        "/path/to/Downloads/Samples",
+        "/path/to/Desktop/NewSamples",
         "/Applications/Ableton Live/Library/Samples"
     ]
     
