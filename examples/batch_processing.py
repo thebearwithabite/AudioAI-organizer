@@ -31,15 +31,15 @@ def main():
         print("❌ Please set your OPENAI_API_KEY environment variable")
         return
     
-    LIBRARY_PATH = "/path/to/your/audio/library"  # Change this!
+    LIBRARY_PATH = os.getenv("AUDIOAI_BASE_DIRECTORY", "")
+    if not LIBRARY_PATH:
+        print("❌ Please set AUDIOAI_BASE_DIRECTORY environment variable")
+        print("   export AUDIOAI_BASE_DIRECTORY='/path/to/your/audio/library'")
+        return
     
     # Directories to scan for audio files
-    SCAN_DIRECTORIES = [
-        "/Users/username/Downloads",
-        "/Users/username/Desktop/Audio",
-        "/Users/username/Documents/Music",
-        # Add your directories here
-    ]
+    raw_scan = os.getenv("AUDIOAI_SCAN_DIRS", "")
+    SCAN_DIRECTORIES = [p.strip() for p in raw_scan.split(",") if p.strip()] or [LIBRARY_PATH]
     
     print(" AudioAI Organizer - Batch Processing Example")
     print("=" * 55)

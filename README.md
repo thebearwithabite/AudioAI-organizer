@@ -61,7 +61,7 @@ pip install openai librosa mutagen pandas openpyxl numpy pathlib
 
 ### Quick Setup
 ```bash
-git clone https://github.com/yourusername/audioai-organizer.git
+git clone https://github.com/thebearwithabite/AudioAI-organizer.git
 cd audioai-organizer
 pip install -r requirements.txt
 

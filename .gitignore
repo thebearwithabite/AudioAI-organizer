@@ -1,4 +1,16 @@
 # Ignore Jupyter notebooks
 Audio Organizer.ipynb
 AdaptiveLearningFileSystem copy.ipynb
-The Papers that Dream AI Organizer.ipynb 
+The Papers that Dream AI Organizer.ipynb
+
+# Environment and sensitive files
+.env
+
+# Metadata system directory
+04_METADATA_SYSTEM/
+
+# Python cache
+__pycache__/
+
+# macOS files
+.DS_Store
