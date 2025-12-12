@@ -4,7 +4,7 @@
 
 Transform your chaotic audio collections into intelligently organized, searchable libraries with AI that actually *listens* to your content and learns your creative patterns.
 
-![GitHub stars](https://img.shields.io/github/stars/thebearwithabite/audioai-organizer)
+![GitHub stars](https://img.shields.io/github/stars/user/audioai-organizer)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.8+-brightgreen.svg)
 
@@ -61,7 +61,7 @@ pip install openai librosa mutagen pandas openpyxl numpy pathlib
 
 ### Quick Setup
 ```bash
-git clone https://github.com/thebearwithabite/AudioAI-organizer.git
+git clone https://github.com/user/AudioAI-organizer.git
 cd audioai-organizer
 pip install -r requirements.txt
 
@@ -302,7 +302,7 @@ Found an issue? Please include:
 
 ### **Development Setup**
 ```bash
-git clone https://github.com/thebearwithabite/AudioAI-Organizer.git
+git clone https://github.com/user/AudioAI-Organizer.git
 cd audioai-organizer
 pip install -e ".[dev]"
 pytest tests/
@@ -341,8 +341,8 @@ Built with ❤️ for the audio community. 🐻
 ##  Star this repo if AudioAI transformed your audio workflow!
 
 **Questions? Ideas? Success stories?**
--  [Open an issue](https://github.com/thebearwithabite/AudioAI-Organizer/issues)
--  Email: [rt@papersthatdream.com](rt@papersthatdream.com)
+-  [Open an issue](https://github.com/user/AudioAI-Organizer/issues)
+-  Email: [user@example.com](user@example.com)
 -  Substack:  [rt-max.substack.com](https://rt-max.substack.com)
 
 *From audio chaos to intelligent organization. AudioAI learns, adapts, and grows with your creative vision.*

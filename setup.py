@@ -7,11 +7,11 @@ setup(
     name="audioai-organizer",
     version="1.0.16
     author="RT Max",
-    author_email="rt@papersthatdream.com",
+    author_email="user@example.com",
     description="Intelligent audio library organization with AI-powered analysis",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/thebearwithabite/audioai-organizer",
+    url="https://github.com/user/audioai-organizer",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 5 - Production/Stable",

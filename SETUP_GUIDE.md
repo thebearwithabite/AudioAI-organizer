@@ -19,7 +19,7 @@ Complete step-by-step setup instructions for AudioAI Organizer.
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/thebearwithabite/AudioAI-organizer.git
+git clone https://github.com/user/AudioAI-organizer.git
 cd audioai-organizer
 ```
 
@@ -81,7 +81,7 @@ set OPENAI_API_KEY=sk-your-actual-api-key-here
 **Option B: Direct in Code**
 ```python
 organizer = AdaptiveAudioOrganizer(
-    openai_api_key="sk-your-actual-api-key-here",
+    openai_sk-your-actual-api-key-here: "[REDACTED_API_KEY]",
     base_directory="/path/to/your/audio/library"
 )
 ```
@@ -268,8 +268,8 @@ logging.basicConfig(level=logging.DEBUG)
 ```
 
 **Contact Support:**
--  Email: rt@papersthatdream.com
--  [GitHub Issues](https://github.com/thebearwithabite/AudioAI-organizer/issues)
+-  Email: user@example.com
+-  [GitHub Issues](https://github.com/user/AudioAI-organizer/issues)
 -  [Full Documentation](https://docs.papersthatdreamn.com)
 
 ##  Next Steps
