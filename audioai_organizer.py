@@ -975,7 +975,7 @@ class AdaptiveAudioOrganizer:
             
             # Tempo analysis
             tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
-            features['tempo'] = float(tempo)
+            features['tempo'] = float(tempo) if np.ndim(tempo) == 0 else float(tempo[0])
             
             # Energy (RMS)
             rms = librosa.feature.rms(y=y)[0]
@@ -1450,7 +1450,7 @@ def fixed_analyze_audio_content(self, file_path):
         
         # Tempo analysis - FIXED
         tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
-        features['tempo'] = float(tempo) if np.isscalar(tempo) else float(tempo[0])
+        features['tempo'] = float(tempo) if np.ndim(tempo) == 0 else float(tempo[0])
         
         # Energy (RMS)
         rms = librosa.feature.rms(y=y)[0]
@@ -1656,7 +1656,7 @@ class FixedAdaptiveAudioOrganizer:
             
             # Tempo analysis - FIXED
             tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
-            features['tempo'] = float(tempo) if np.isscalar(tempo) else float(tempo[0])
+            features['tempo'] = float(tempo) if np.ndim(tempo) == 0 else float(tempo[0])
             
             # Energy (RMS)
             rms = librosa.feature.rms(y=y)[0]
@@ -2232,7 +2232,7 @@ class FixedAdaptiveAudioOrganizer:
             
             # Tempo analysis - FIXED
             tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
-            features['tempo'] = float(tempo) if np.isscalar(tempo) else float(tempo[0])
+            features['tempo'] = float(tempo) if np.ndim(tempo) == 0 else float(tempo[0])
             
             # Energy (RMS)
             rms = librosa.feature.rms(y=y)[0]
