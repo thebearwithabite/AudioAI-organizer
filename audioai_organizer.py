@@ -4548,6 +4548,35 @@ print("🚀 System ready! What scene do you need audio for?")
 suggest_cues_for_attention_scene("quiet moment of attention mechanism awakening")
 
 
+# Add missing safe file move functionality
+def move_file_safely(self, source_path, target_folder, new_filename=None):
+    """Move file to target folder, handling duplicates"""
+    target_dir = Path(target_folder)
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    source_path = Path(source_path)
+
+    if new_filename:
+        target_path = target_dir / new_filename
+    else:
+        target_path = target_dir / source_path.name
+
+    # Handle duplicates
+    if target_path.exists():
+        stem = target_path.stem
+        suffix = target_path.suffix
+        counter = 1
+        while target_path.exists():
+            target_path = target_dir / f"{stem}_{counter}{suffix}"
+            counter += 1
+
+    try:
+        shutil.move(str(source_path), str(target_path))
+        return target_path
+    except Exception as e:
+        print(f"Error moving file: {e}")
+        return None
+
 # Fix the string/Path issue in batch processing
 def interactive_batch_process_fixed(self, file_list, confidence_threshold=0.7, dry_run=True):
     """Fixed batch processing that handles string paths properly."""
@@ -4556,8 +4585,12 @@ def interactive_batch_process_fixed(self, file_list, confidence_threshold=0.7, d
         return []
     
     # Set confidence threshold for this batch
-    original_threshold = self.interaction_threshold
-    self.interaction_threshold = confidence_threshold
+    if hasattr(self, 'interaction_threshold'):
+        original_threshold = self.interaction_threshold
+        self.interaction_threshold = confidence_threshold
+    else:
+        original_threshold = None
+        self.interaction_threshold = confidence_threshold
     
     print(f"\n🎵 Starting interactive batch processing...")
     print(f"📁 Files to process: {len(file_list)}")
@@ -4570,10 +4603,12 @@ def interactive_batch_process_fixed(self, file_list, confidence_threshold=0.7, d
     skipped_count = 0
     
     try:
-        for i, file_path in enumerate(file_list):
+        for i, file_item in enumerate(file_list):
             # Convert to Path object if it's a string
-            if isinstance(file_path, str):
-                file_path = Path(file_path)
+            if isinstance(file_item, str):
+                file_path = Path(file_item)
+            else:
+                file_path = file_item
             
             try:
                 print(f"\n[{i+1}/{len(file_list)}] Processing: {file_path.name}")
@@ -4618,7 +4653,8 @@ def interactive_batch_process_fixed(self, file_list, confidence_threshold=0.7, d
     
     finally:
         # Restore original threshold
-        self.interaction_threshold = original_threshold
+        if original_threshold is not None:
+            self.interaction_threshold = original_threshold
     
     print(f"\n{'='*50}")
     print(f"🎉 Batch processing completed!")
@@ -4631,6 +4667,16 @@ def interactive_batch_process_fixed(self, file_list, confidence_threshold=0.7, d
 
 # Apply the fix
 import types
+# Ensure move_file_safely is available
+if not hasattr(AdaptiveAudioOrganizer, 'move_file_safely'):
+    AdaptiveAudioOrganizer.move_file_safely = move_file_safely
+if not hasattr(FixedAdaptiveAudioOrganizer, 'move_file_safely'):
+    FixedAdaptiveAudioOrganizer.move_file_safely = move_file_safely
+
+# Patch the organizer instance
+if not hasattr(organizer, 'move_file_safely'):
+    organizer.move_file_safely = types.MethodType(move_file_safely, organizer)
+
 organizer.interactive_batch_process = types.MethodType(interactive_batch_process_fixed, organizer)
 
 print("🔧 Fixed the batch processing string/Path issue!")
