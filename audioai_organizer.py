@@ -232,7 +232,14 @@ Return response as JSON:
         similar = []
         for entry in self.learning_data['classifications']:
             if self.filename_similarity(filename, entry['filename']) > 0.3:
-                similar.append(entry)
+                # Make sure we have the right structure
+                classification = entry.get('classification', {})
+                similar_entry = {
+                    'filename': entry['filename'],
+                    'category': classification.get('category', 'unknown'),
+                    'mood': classification.get('mood', 'unknown')
+                }
+                similar.append(similar_entry)
         return similar[:5]  # Return top 5 similar files
     
     def filename_similarity(self, filename1, filename2):
