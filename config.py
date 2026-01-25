@@ -44,6 +44,8 @@ def resolve_test_file() -> Path:
 
 
 def ensure_base_structure() -> Path:
-    meta_dir = BASE_DIRECTORY / "04_METADATA_SYSTEM"
+    # Use centralized local metadata root (Rule #3)
+    from gdrive_integration import get_metadata_root
+    meta_dir = get_metadata_root()
     meta_dir.mkdir(parents=True, exist_ok=True)
     return meta_dir
