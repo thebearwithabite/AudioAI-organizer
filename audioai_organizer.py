@@ -9,15 +9,24 @@ import mutagen
 from collections import defaultdict
 import pickle
 from datetime import datetime
+import sys
+
+# Add project root to path for imports
+project_root = Path(__file__).parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+from gdrive_integration import get_metadata_root
 
 class AdaptiveAudioOrganizer:
     def __init__(self, openai_api_key, base_directory):
         self.client = OpenAI(api_key=openai_api_key)
         self.base_dir = Path(base_directory)
         
-        # Learning system files
-        self.learning_data_file = self.base_dir / "04_METADATA_SYSTEM" / "learning_data.pkl"
-        self.discovered_categories_file = self.base_dir / "04_METADATA_SYSTEM" / "discovered_categories.json"
+        # Learning system files (Rule #3)
+        metadata_root = get_metadata_root()
+        self.learning_data_file = metadata_root / "learning_data.pkl"
+        self.discovered_categories_file = metadata_root / "discovered_categories.json"
         
         # Load existing learning data
         self.learning_data = self.load_learning_data()
@@ -844,9 +853,10 @@ class AdaptiveAudioOrganizer:
         self.client = OpenAI(api_key=openai_api_key)
         self.base_dir = Path(base_directory)
         
-        # Learning system files
-        self.learning_data_file = self.base_dir / "04_METADATA_SYSTEM" / "learning_data.pkl"
-        self.discovered_categories_file = self.base_dir / "04_METADATA_SYSTEM" / "discovered_categories.json"
+        # Learning system files (Rule #3)
+        metadata_root = get_metadata_root()
+        self.learning_data_file = metadata_root / "learning_data.pkl"
+        self.discovered_categories_file = metadata_root / "discovered_categories.json"
         
         # Load existing learning data
         self.learning_data = self.load_learning_data()
@@ -1541,9 +1551,10 @@ class FixedAdaptiveAudioOrganizer:
         self.client = OpenAI(api_key=openai_api_key)
         self.base_dir = Path(base_directory)
         
-        # Learning system files
-        self.learning_data_file = self.base_dir / "04_METADATA_SYSTEM" / "learning_data.pkl"
-        self.discovered_categories_file = self.base_dir / "04_METADATA_SYSTEM" / "discovered_categories.json"
+        # Learning system files (Rule #3)
+        metadata_root = get_metadata_root()
+        self.learning_data_file = metadata_root / "learning_data.pkl"
+        self.discovered_categories_file = metadata_root / "discovered_categories.json"
         
         # Load existing learning data
         self.learning_data = self.load_learning_data()
@@ -2117,9 +2128,10 @@ class FixedAdaptiveAudioOrganizer:
         self.client = OpenAI(api_key=openai_api_key)
         self.base_dir = Path(base_directory)
         
-        # Learning system files
-        self.learning_data_file = self.base_dir / "04_METADATA_SYSTEM" / "learning_data.pkl"
-        self.discovered_categories_file = self.base_dir / "04_METADATA_SYSTEM" / "discovered_categories.json"
+        # Learning system files (Rule #3)
+        metadata_root = get_metadata_root()
+        self.learning_data_file = metadata_root / "learning_data.pkl"
+        self.discovered_categories_file = metadata_root / "discovered_categories.json"
         
         # Load existing learning data
         self.learning_data = self.load_learning_data()
@@ -3231,7 +3243,7 @@ def create_metadata_spreadsheet(self):
     df = pd.DataFrame(data)
     
     # Save to Excel file
-    output_file = self.base_dir / "04_METADATA_SYSTEM" / f"audio_metadata_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    output_file = get_metadata_root() / f"audio_metadata_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
     output_file.parent.mkdir(parents=True, exist_ok=True)
     
     df.to_excel(output_file, index=False)
@@ -3336,7 +3348,7 @@ def create_metadata_csv(self):
     df = pd.DataFrame(data)
     
     # Save CSV
-    csv_file = self.base_dir / "04_METADATA_SYSTEM" / f"audio_metadata_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    csv_file = get_metadata_root() / f"audio_metadata_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
     csv_file.parent.mkdir(parents=True, exist_ok=True)
     
     df.to_csv(csv_file, index=False)
